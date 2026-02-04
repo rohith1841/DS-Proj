@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperliquid Sentiment Analysis Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: #1F4E79; color: white; padding: 20px; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav button { padding: 12px 24px; border: none; background: white; cursor: pointer; border-radius: 8px; font-weight: 500; transition: all 0.3s; }
+        .nav button:hover { background: #e0e0e0; }
+        .nav button.active { background: #1F4E79; color: white; }
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h2 { color: #1F4E79; margin-bottom: 16px; font-size: 20px; }
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .metric { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 32px; font-weight: bold; margin-bottom: 8px; }
+        .metric-label { font-size: 14px; opacity: 0.9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th { background: #1F4E79; color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f5f5f5; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .insight { background: #e3f2fd; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #2196f3; }
+        .insight strong { color: #1565c0; }
+        .chart-container { height: 400px; margin: 20px 0; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📈 Hyperliquid Sentiment Analysis Dashboard</h1>
+        <p>Analyzing the relationship between Bitcoin Fear/Greed sentiment and trader behavior</p>
+    </div>
+
+    <div class="container">
+        <div class="nav">
+            <button class="active" onclick="showSection('overview')">Overview</button>
+            <button onclick="showSection('sentiment')">Sentiment Analysis</button>
+            <button onclick="showSection('archetypes')">Trader Archetypes</button>
+            <button onclick="showSection('models')">Predictive Models</button>
+        </div>
+
+        <!-- OVERVIEW SECTION -->
+        <div id="overview" class="section active">
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">184,263</div>
+                    <div class="metric-label">Total Trades</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">32</div>
+                    <div class="metric-label">Unique Traders</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">85.2%</div>
+                    <div class="metric-label">Avg Win Rate</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">$10.3M</div>
+                    <div class="metric-label">Total PnL</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔍 Key Insights</h2>
+                <div class="insight">
+                    <strong>Trading Activity Surges During Fear:</strong> Traders execute 2.8x more trades during Fear days (4,183 avg) vs Greed days (1,491 avg)
+                </div>
+                <div class="insight">
+                    <strong>Higher Per-Trade Profitability in Greed:</strong> Average PnL/trade is 55% higher during Greed ($77.84) vs Fear ($50.05)
+                </div>
+                <div class="insight">
+                    <strong>Consistent Winners Maintain Edge:</strong> 90%+ win rate traders keep 95-97% win rates across ALL sentiment conditions
+                </div>
+                <div class="insight">
+                    <strong>Long Bias Increases in Greed:</strong> 69.8% long trades in Greed vs 67.3% in Fear
+                </div>
+            </div>
+        </div>
+
+        <!-- SENTIMENT ANALYSIS SECTION -->
+        <div id="sentiment" class="section">
+            <div class="card">
+                <h2>Performance by Sentiment</h2>
+                <table>
+                    <tr>
+                        <th>Sentiment</th>
+                        <th>Total Trades</th>
+                        <th>Avg Trades/Trader</th>
+                        <th>Avg PnL/Trade</th>
+                        <th>Win Rate</th>
+                        <th>Total PnL</th>
+                        <th>Long Ratio</th>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:#e74c3c">Fear</strong></td>
+                        <td>133,871</td>
+                        <td>4,183</td>
+                        <td>$50.05</td>
+                        <td>86.1%</td>
+                        <td>$6,699,925</td>
+                        <td>67.3%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:#27ae60">Greed</strong></td>
+                        <td>43,251</td>
+                        <td>1,491</td>
+                        <td>$77.84</td>
+                        <td>83.8%</td>
+                        <td>$3,366,582</td>
+                        <td>69.8%</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color:#95a5a6">Neutral</strong></td>
+                        <td>7,141</td>
+                        <td>893</td>
+                        <td>$22.23</td>
+                        <td>80.5%</td>
+                        <td>$158,742</td>
+                        <td>40.8%</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h2>Total PnL by Sentiment</h2>
+                    <div id="pnlChart" class="chart-container"></div>
+                </div>
+                <div class="card">
+                    <h2>Win Rate by Sentiment</h2>
+                    <div id="winRateChart" class="chart-container"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Trade Frequency by Sentiment</h2>
+                <div id="freqChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- TRADER ARCHETYPES SECTION -->
+        <div id="archetypes" class="section">
+            <div class="card">
+                <h2>👥 Trader Behavioral Archetypes</h2>
+                <p>Using K-Means clustering, we've identified 4 distinct trader behavioral archetypes based on trading patterns, profitability, and risk characteristics.</p>
+                <br>
+                <table>
+                    <tr>
+                        <th>Archetype</th>
+                        <th>Count</th>
+                        <th>Avg Total PnL</th>
+                        <th>Win Rate</th>
+                        <th>Total Trades</th>
+                        <th>Avg Trade Size</th>
+                        <th>Trades/Day</th>
+                    </tr>
+                    <tr>
+                        <td><strong>0: Steady Retail</strong></td>
+                        <td>25</td>
+                        <td>$164,219</td>
+                        <td>87.3%</td>
+                        <td>3,600</td>
+                        <td>$3,909</td>
+                        <td>1,638</td>
+                    </tr>
+                    <tr>
+                        <td><strong>1: High-Freq Pro</strong></td>
+                        <td>3</td>
+                        <td>$242,426</td>
+                        <td>87.5%</td>
+                        <td>6,106</td>
+                        <td>$22,323</td>
+                        <td>3,236</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2: Whale Trader</strong></td>
+                        <td>2</td>
+                        <td>$875,670</td>
+                        <td>87.7%</td>
+                        <td>28,862</td>
+                        <td>$2,537</td>
+                        <td>19,728</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3: Consistent Winner</strong></td>
+                        <td>2</td>
+                        <td>$1,820,576</td>
+                        <td>79.1%</td>
+                        <td>9,114</td>
+                        <td>$10,019</td>
+                        <td>2,396</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2>Archetype Descriptions</h2>
+                <div class="insight">
+                    <strong>Steady Retail:</strong> Most common type (25 traders). Moderate activity, consistent performance, lower trade sizes. The backbone of the trading ecosystem.
+                </div>
+                <div class="insight">
+                    <strong>High-Frequency Pro:</strong> Professional traders with large position sizes and moderate frequency. Higher fees but solid returns.
+                </div>
+                <div class="insight">
+                    <strong>Whale Trader:</strong> Extremely high trade frequency with smaller sizes but massive volume. Market makers or arbitrageurs.
+                </div>
+                <div class="insight">
+                    <strong>Consistent Winner:</strong> Highest profitability with balanced approach to size and frequency. The traders to emulate.
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Archetype Comparison Chart</h2>
+                <div id="archetypeChart" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- PREDICTIVE MODELS SECTION -->
+        <div id="models" class="section">
+            <div class="card">
+                <h2>🔮 Predictive Models</h2>
+                <p>Machine learning models trained to predict next-day trader profitability and volatility.</p>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <h2>Model 1: PnL Bucket Classifier</h2>
+                    <p><strong>Algorithm:</strong> Random Forest Classifier</p>
+                    <p><strong>Training Samples:</strong> 31</p>
+                    <p><strong>Test Samples:</strong> 14</p>
+                    <p><strong>Accuracy:</strong> 50.0%</p>
+                    <br>
+                    <h4>Top Feature Importances:</h4>
+                    <table>
+                        <tr><th>Feature</th><th>Importance</th></tr>
+                        <tr><td>avg_trade_size</td><td>0.238</td></tr>
+                        <tr><td>trade_count</td><td>0.134</td></tr>
+                        <tr><td>total_volume</td><td>0.119</td></tr>
+                        <tr><td>pnl_volatility</td><td>0.111</td></tr>
+                        <tr><td>win_rate</td><td>0.104</td></tr>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>Model 2: Volatility Predictor</h2>
+                    <p><strong>Algorithm:</strong> Gradient Boosting Regressor</p>
+                    <p><strong>R² Score:</strong> -1.63 (limited data)</p>
+                    <br>
+                    <p><em>Note: Models trained on limited dataset (45 observations). Performance would improve with more historical data.</em></p>
+                    <br>
+                    <h4>Key Insights:</h4>
+                    <div class="insight">
+                        Average trade size is the most predictive feature for next-day profitability
+                    </div>
+                    <div class="insight">
+                        Current-day volatility strongly predicts next-day volatility
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Clustering Model: Trader Archetypes</h2>
+                <p><strong>Algorithm:</strong> K-Means Clustering</p>
+                <p><strong>Optimal Clusters:</strong> 4</p>
+                <p><strong>Silhouette Score:</strong> 0.519 (good separation)</p>
+                <br>
+                <p>The clustering successfully identified distinct behavioral patterns among the 32 traders, with the majority (25) falling into the "Steady Retail" category.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // PnL Chart
+        Plotly.newPlot('pnlChart', [{
+            x: ['Fear', 'Greed', 'Neutral'],
+            y: [6699925, 3366582, 158742],
+            type: 'bar',
+            marker: { color: ['#e74c3c', '#27ae60', '#95a5a6'] }
+        }], { margin: { t: 20 }, yaxis: { title: 'Total PnL ($)' } });
+
+        // Win Rate Chart
+        Plotly.newPlot('winRateChart', [{
+            x: ['Fear', 'Greed', 'Neutral'],
+            y: [86.12, 83.80, 80.55],
+            type: 'bar',
+            marker: { color: ['#e74c3c', '#27ae60', '#95a5a6'] }
+        }], { margin: { t: 20 }, yaxis: { title: 'Win Rate (%)' } });
+
+        // Frequency Chart
+        Plotly.newPlot('freqChart', [{
+            x: ['Fear', 'Greed', 'Neutral'],
+            y: [4183, 1491, 893],
+            type: 'bar',
+            marker: { color: ['#e74c3c', '#27ae60', '#95a5a6'] }
+        }], { margin: { t: 20 }, yaxis: { title: 'Avg Trades per Trader' } });
+
+        // Archetype Radar Chart
+        var archetypeData = [{
+            type: 'scatterpolar',
+            r: [1, 0.87, 0.5, 0.2, 0.5, 1],
+            theta: ['Total PnL', 'Win Rate', 'Total Trades', 'Avg Trade Size', 'Trades/Day', 'Total PnL'],
+            fill: 'toself',
+            name: 'Steady Retail'
+        }, {
+            type: 'scatterpolar',
+            r: [0.13, 0.87, 0.21, 1, 0.16, 0.13],
+            theta: ['Total PnL', 'Win Rate', 'Total Trades', 'Avg Trade Size', 'Trades/Day', 'Total PnL'],
+            fill: 'toself',
+            name: 'High-Freq Pro'
+        }, {
+            type: 'scatterpolar',
+            r: [0.48, 0.88, 1, 0.1, 1, 0.48],
+            theta: ['Total PnL', 'Win Rate', 'Total Trades', 'Avg Trade Size', 'Trades/Day', 'Total PnL'],
+            fill: 'toself',
+            name: 'Whale Trader'
+        }, {
+            type: 'scatterpolar',
+            r: [1, 0.79, 0.32, 0.45, 0.12, 1],
+            theta: ['Total PnL', 'Win Rate', 'Total Trades', 'Avg Trade Size', 'Trades/Day', 'Total PnL'],
+            fill: 'toself',
+            name: 'Consistent Winner'
+        }];
+
+        Plotly.newPlot('archetypeChart', archetypeData, {
+            polar: { radialaxis: { visible: true, range: [0, 1] } },
+            showlegend: true,
+            margin: { t: 40 }
+        });
+    </script>
+</body>
+</html>

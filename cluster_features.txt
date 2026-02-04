@@ -1,0 +1,7 @@
+total_pnl
+win_rate
+total_trades
+avg_trade_size
+pnl_volatility
+trades_per_day
+total_fees

@@ -1,0 +1,10 @@
+sentiment_value
+sentiment_encoded
+total_pnl
+avg_pnl
+trade_count
+total_volume
+avg_trade_size
+win_rate
+total_fees
+pnl_volatility
