@@ -32,3 +32,7 @@ streamlit run app.py
 
 - Hyperliquid trading data (32 traders, 184K+ trades)
 - Alternative.me Bitcoin Fear & Greed Index
+
+---
+*DS-Proj: Intern project*
+
